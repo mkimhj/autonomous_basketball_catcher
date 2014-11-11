@@ -41,7 +41,12 @@ class Find:
 		contours, _ = cv2.findContours(ranged.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 		processed = np.zeros((480, 640, 3), np.uint8)
 		processed[:, :, 0] = ranged
-		cv2.drawContours(processed, contours, -1, (0, 255, 0), 3)
+		valid_contours = np.zeros(0)
+		for contour in contours:
+			area = cv2.contourArea(contour)
+			if area < 500:
+				valid_contours.append(contours)
+		cv2.drawContours(processed, valid_contours, -1, (0, 255, 0), 3)
 		cv2.imshow('depth', depth)
 		cv2.imshow('processed', processed)
 		cv2.waitKey(10)
