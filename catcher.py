@@ -128,6 +128,8 @@ class Navigation:
 	def __init__(self):
 		pass
 
+	def calc_destination_angle(self):
+		pass
 
 class Communication:
 
