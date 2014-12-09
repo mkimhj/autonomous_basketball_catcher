@@ -112,16 +112,31 @@ class Trajectory:
 		plt.xlim([self.x[0]-1, self.x[-1] + 1 ])
 		plt.show()
 
-	def get_projected_coordinates(self, z):
-		# returns x,y coordinates for input z based on calculated parabolas
-		x_coord = self.z_x_poly(z)
-		y_coord = self.z_y_poly(z)
+	def get_projected_coordinates(self):
+		# returns projected x,y coordinates based on calculated parabolas
+
+		print self.z_x_poly.r
+		print self.z_y_poly.r
+
+		x_coord = self.z_x_poly.r[0]
+		y_coord = self.z_y_poly.r[0]
 
 		return [x_coord, y_coord]
 
+class Navigation:
+
+	def __init__(self):
+		pass
+
+
+class Communication:
+
+	def __init__(self):
+		pass
+
 if __name__ == '__main__':
 	Find()
-	sample_data_points = np.array([(1, 1, 1), (2, 2, 2), (3, 3, 3), (4.5, 4, 4), (5, 5, 4.5), (6, 6, 4), (7, 7, 3), (8, 8, 2), (9, 9, 1)])
+	sample_data_points = np.array([(1, 1, 1), (2, 2, 2), (3, 3, 3), (4.5, 4, 4), (5, 5, 1.5), (6, 6, 0.75), (7, 7, 0.25), (8, 8, .2), (9, 9, 0.1)])
 	trajectory = Trajectory(sample_data_points)
-	print(trajectory.get_projected_coordinates(2.3))
+	print(trajectory.get_projected_coordinates());
 	trajectory.show_polynomials()
