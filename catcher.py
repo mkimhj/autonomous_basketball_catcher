@@ -2,8 +2,8 @@
 
 import numpy as np
 from scipy.optimize import curve_fit
-import freenect
-import cv2
+#import freenect
+#import cv2
 import matplotlib.pyplot as plt
 from math import pi, atan
 
@@ -15,6 +15,8 @@ K_HALF_HEIGHT = 480 / 2
 K_VERTICAL_DEPTH = K_HALF_HEIGHT / atan(K_VERTICAL_FOV / 2)
 K_HORIZONTAL_DEPTH = K_HALF_WIDTH / atan(K_HORIZONTAL_FOV / 2)
 K_MAX_DEPTH_MM = 10000
+
+DEBUG = True
 
 class Find:
 
@@ -115,8 +117,8 @@ class Trajectory:
 	def get_projected_coordinates(self):
 		# returns projected x,y coordinates based on calculated parabolas
 
-		print self.z_x_poly.r
-		print self.z_y_poly.r
+		log(self.z_x_poly.r)
+		log(self.z_y_poly.r)
 
 		x_coord = self.z_x_poly.r[0]
 		y_coord = self.z_y_poly.r[0]
@@ -125,20 +127,45 @@ class Trajectory:
 
 class Navigation:
 
-	def __init__(self):
-		pass
+	def __init__(self, current_coord, current_angle, projected_coord):
+		# TODO: returns current x, y coordinates and angle of hercules robot trash can
+		self.current_coord = current_coord
+		self.current_angle = current_angle
+		self.projected_coord = projected_coord
 
 	def calc_destination_angle(self):
-		pass
+		x_dist = self.projected_coord[0] - self.current_coord[0]
+		y_dist = self.projected_coord[1] - self.current_coord[1]
+
+		print x_dist
+		print y_dist
+		
+		raw_angle = np.tan([y_dist/x_dist])
+		print raw_angle
+		adjusted_angle = self.current_angle - raw_angle
+
+		return adjusted_angle
 
 class Communication:
 
 	def __init__(self):
 		pass
 
+# Utility Methods
+def log(msg):
+	if DEBUG:
+		print "catcher.py: " + str(msg);
+
 if __name__ == '__main__':
-	Find()
+	#Find()
 	sample_data_points = np.array([(1, 1, 1), (2, 2, 2), (3, 3, 3), (4.5, 4, 4), (5, 5, 1.5), (6, 6, 0.75), (7, 7, 0.25), (8, 8, .2), (9, 9, 0.1)])
 	trajectory = Trajectory(sample_data_points)
-	print(trajectory.get_projected_coordinates());
+
+	projected_coord = trajectory.get_projected_coordinates()
+	log(projected_coord);
+
+	navigation = Navigation([0,0], 90, projected_coord);
+	log(navigation.calc_destination_angle());
+
 	trajectory.show_polynomials()
+
