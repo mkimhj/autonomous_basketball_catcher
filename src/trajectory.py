@@ -3,6 +3,8 @@
 import rospy
 import tf
 import numpy as np
+import warnings
+warnings.filterwarnings('ignore')
 
 class Trajectory:
 
@@ -16,16 +18,16 @@ class Trajectory:
 		while not rospy.is_shutdown():
 			now = rospy.Time.now()
 			try:
-				listener.waitForTransform('trash', 'robot', now, rospy.Duration(2.0))
+				listener.waitForTransform('trash', 'robot', now, rospy.Duration(0.2))
 				position, orientation = listener.lookupTransform('trash', 'robot', now)
-				self.x = self.x[-4:-1]
-				self.y = self.y[-4:-1]
-				self.z = self.z[-4:-1]
+				print "sample:", position
+				self.x = self.x[-6:-1]
+				self.y = self.y[-6:-1]
+				self.z = self.z[-6:-1]
 				self.x.append(position[0])
 				self.y.append(position[1])
 				self.z.append(position[2])
-				self.compute_polynomials()
-				x, y = self.get_projected_coordinates()
+				x, y = self.get_projected_coordinates_from_line()
 				if x and y:
 					print x, y
 					broadcaster.sendTransform((x, y, 0), (0, 0, 0, 1), now, 'goal', 'robot')
@@ -46,6 +48,8 @@ class Trajectory:
 		self.z_x_poly = np.poly1d(x_z)
 		self.z_y_poly = np.poly1d(y_z)
 
+	
+
 	def show_polynomials(self):
 		x_new = np.linspace(self.x[0], self.x[-1], 50)
 		y_new = np.linspace(self.y[0], self.y[-1], 50)
@@ -65,6 +69,7 @@ class Trajectory:
 		plt.show()
 
 	def get_projected_coordinates(self):
+		self.compute_polynomials()
 		# returns projected x,y coordinates based on calculated parabolas
 
 		print(self.z_x_poly.r)
@@ -77,6 +82,9 @@ class Trajectory:
 			return (None, None)
 
 		return (x_coord, y_coord)
+
+	def get_projected_coordinates_from_line(self):
+		self.compute_line()
 
 if __name__ == '__main__':
 	Trajectory()
