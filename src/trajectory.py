@@ -18,15 +18,16 @@ class Trajectory:
 			try:
 				listener.waitForTransform('trash', 'robot', now, rospy.Duration(2.0))
 				position, orientation = listener.lookupTransform('trash', 'robot', now)
-				if len(self.x) > 5:
-					self.x = []
-					self.y = []
-					self.z = []
+				self.x = self.x[-4:-1]
+				self.y = self.y[-4:-1]
+				self.z = self.z[-4:-1]
 				self.x.append(position[0])
 				self.y.append(position[1])
 				self.z.append(position[2])
 				self.compute_polynomials()
 				x, y = self.get_projected_coordinates()
+				print self.x, self.y, self.z
+				print x, y
 				broadcaster.sendTransform((x, y, 0), (0, 0, 0, 1), now, 'goal', 'robot')
 			except tf.Exception as e:
 				print e

@@ -1,5 +1,8 @@
 <launch>
 
+  <!-- Run Kinect as a ROS node. -->
+  <include file="$(find freenect_launch)/launch/freenect.launch" />
+
   <!-- Takes in images from the Kinect and outputs ar frames. -->
   <arg name="marker_size" default="16.9" />
   <arg name="max_new_marker_error" default="0.04" />
@@ -8,7 +11,7 @@
   <arg name="cam_image_topic" default="/camera/rgb/image_color" />
   <arg name="cam_info_topic" default="/camera/rgb/camera_info" />
   <arg name="bundle_file_names" default="$(find catcher)/bundles/robot.xml" />
-  <node name="ar_track_alvar_left" pkg="ar_track_alvar" type="findMarkerBundlesNoKinect" respawn="false" output="screen" args="$(arg marker_size) $(arg max_new_marker_error) $(arg max_track_error) $(arg cam_image_topic) $(arg cam_info_topic) $(arg output_frame) $(arg bundle_file_names)" />
+  <node name="ar_track" pkg="ar_track_alvar" type="findMarkerBundlesNoKinect" respawn="false" output="screen" args="$(arg marker_size) $(arg max_new_marker_error) $(arg max_track_error) $(arg cam_image_topic) $(arg cam_info_topic) $(arg output_frame) $(arg bundle_file_names)" />
 
   <!--
     Static tf publisher that broadcasts the transform from the ar tags to the
