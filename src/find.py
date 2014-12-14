@@ -27,28 +27,27 @@ class Find:
 		self.cv_bridge = CvBridge()
 		rospy.spin()
 
-	def process_image(self, depth):
-		depth = self.cv_bridge.imgmsg_to_cv2(depth)
+	def process_image(self, msg):
+		depth = self.cv_bridge.imgmsg_to_cv2(msg)
 		depth = depth.astype(float) / K_MAX_DEPTH_MM
 		depth[depth == 0] = 1
-		ranged = cv2.inRange(depth, 0, 0.3)
+		ranged = cv2.inRange(depth, 0, 0.2)
 		contours, _ = cv2.findContours(ranged.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 		processed = np.zeros((480, 640, 3), np.uint8)
 		processed[:, :, 0] = ranged
 		for contour in contours:
 			area = cv2.contourArea(contour)
-			if 100 < area < 1500:
+			if 500 < area < 5000:
 				cv2.drawContours(processed, np.array([contour]), -1, (0, 255, 0), 3)
 				rect = cv2.boundingRect(contour)
 				x, y, w, h = rect
 				x += w / 2
 				y += h / 2
-				z = depth[y, x]
+				z = depth[y, x] * 10
 				if not isnan(z):
-					self.tf.sendTransform(self.project(x, y, z),
-						tf.transformations.quaternion_from_euler(0, 0, 0),
-						rospy.Time.now(),
-						"trash", "camera_depth_frame")
+					self.tf.sendTransform(self.project(x, y, z), (0, 0, 0, 1),
+						msg.header.stamp, "trash", "camera_depth_optical_frame")
+				break
 		cv2.imshow('depth', processed)
 		cv2.waitKey(10)
 
@@ -57,7 +56,7 @@ class Find:
 		v -= K_HALF_HEIGHT
 		x = (u / K_HORIZONTAL_DEPTH) * z
 		y = (v / K_VERTICAL_DEPTH) * z
-		return x, -y, -z
+		return x, y, z
 
 if __name__ == '__main__':
 	Find()

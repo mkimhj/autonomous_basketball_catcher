@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!--
+    From http://wiki.ros.org/ar_track_alvar#Detecting_multi-tag_bundles:
+    - When facing the tag, positive-z comes out of the front of the tag toward
+      the viewer, positive-x is to the right, and positive-y is up.
+    - The first marker in this file is the "master" tag which is the only tag
+      that will be reported by ar_track_alvar even if it is occluded.
+    - The center of the first marker defines the frame for the other tags.
+    - The order of the corners starts with the lower left corner and progresses
+      counter-clockwise around the tag.
+    - The size of the markers is 16.9 cm (8.45 cm).
+    - Diameter of trash can is 28.8 cm
+    - Width of foam board is 1.5 cm
+    - Total distance from tag to tag is 31.8 cm (15.9 cm)
+
+        1       x         x
+      |---|     ^ Robot   ^ ar_marker_0
+    3  | |  0   | Frame   | Frame
+      |---|     O-- > y   O-- > z
+        2
+-->
+<multimarker markers="4">
+    <marker index="0" status="1">
+        <corner x="-8.45" y="-8.45" z="0" />
+        <corner x="8.45" y="-8.45" z="0" />
+        <corner x="8.45" y="8.45" z="0" />
+        <corner x="-8.45" y="8.45" z="0" />
+    </marker>
+    <marker index="1" status="1">
+        <corner x="15.9" y="-8.45" z="-7.45" />
+        <corner x="15.9" y="-8.45" z="-24.35" />
+        <corner x="15.9" y="8.45" z="-24.35" />
+        <corner x="15.9" y="8.45" z="-7.45" />
+    </marker>
+    <marker index="3" status="1">
+        <corner x="8.45" y="-8.45" z="-28.8" />
+        <corner x="-8.45" y="-8.45" z="-28.8" />
+        <corner x="-8.45" y="8.45" z="-28.8" />
+        <corner x="8.45" y="8.45" z="-28.8" />
+    </marker>
+    <marker index="2" status="1">
+        <corner x="-15.9" y="-8.45" z="-24.35" />
+        <corner x="-15.9" y="-8.45" z="-7.45" />
+        <corner x="-15.9" y="8.45" z="-7.45" />
+        <corner x="-15.9" y="8.45" z="-24.35" />
+    </marker>
+</multimarker>

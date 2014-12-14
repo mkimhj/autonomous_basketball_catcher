@@ -1,13 +1,39 @@
 <launch>
 
-  <arg name="marker_size" default="19.05" />
-  <arg name="max_new_marker_error" default="0.08" />
+  <!-- Takes in images from the Kinect and outputs ar frames. -->
+  <arg name="marker_size" default="16.9" />
+  <arg name="max_new_marker_error" default="0.04" />
   <arg name="max_track_error" default="0.2" />
   <arg name="output_frame" default="/camera_link" />
   <arg name="cam_image_topic" default="/camera/rgb/image_color" />
   <arg name="cam_info_topic" default="/camera/rgb/camera_info" />
-  <node name="ar_track_alvar_left" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen" args="$(arg marker_size) $(arg max_new_marker_error) $(arg max_track_error) $(arg cam_image_topic) $(arg cam_info_topic) $(arg output_frame)" />
+  <arg name="bundle_file_names" default="$(find catcher)/bundles/robot.xml" />
+  <node name="ar_track_alvar_left" pkg="ar_track_alvar" type="findMarkerBundlesNoKinect" respawn="false" output="screen" args="$(arg marker_size) $(arg max_new_marker_error) $(arg max_track_error) $(arg cam_image_topic) $(arg cam_info_topic) $(arg output_frame) $(arg bundle_file_names)" />
 
+  <!--
+    Static tf publisher that broadcasts the transform from the ar tags to the
+    center of the trash can. Look at bundles/robot.xml for more information.
+  -->
+  <arg name="robot_frame" default="robot" />
+  <arg name="robot_parent_frame" default="ar_marker_0" />
+  <arg name="robot_frame_period" default="100" />
+  <arg name="robot_transform" default="-0.159 0 0 -1.5707963268 0 0" />
+  <node name="robot_frame" pkg="tf" type="static_transform_publisher" args="$(arg robot_transform) $(arg robot_parent_frame) $(arg robot_frame) $(arg robot_frame_period)" />
+
+  <!-- Enables ROS to communicate with the Arduino over Bluetooth.
+  <node name="bluetooth" pkg="rosserial_python" type="serial_node.py">
+    <param name="port" value="/dev/ttyACM1"/>
+    <param name="baud" value="115200"/>
+  </node>
+  -->
+
+  <!-- Takes in images from the Kinect and outputs trash frames. -->
   <node name="find" pkg="catcher" type="find.py" output="screen" />
+
+  <!-- Takes in trash frames and outputs goal frames. -->
+  <node name="trajectory" pkg="catcher" type="trajectory.py" output="screen" />
+
+  <!-- Takes in goal frames and sends motor commands. -->
+  <node name="navigation" pkg="catcher" type="navigation.py" output="screen" />
 
 </launch>
