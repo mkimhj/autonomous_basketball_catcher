@@ -26,9 +26,9 @@ class Trajectory:
 				self.z.append(position[2])
 				self.compute_polynomials()
 				x, y = self.get_projected_coordinates()
-				print self.x, self.y, self.z
-				print x, y
-				broadcaster.sendTransform((x, y, 0), (0, 0, 0, 1), now, 'goal', 'robot')
+				if x and y:
+					print x, y
+					broadcaster.sendTransform((x, y, 0), (0, 0, 0, 1), now, 'goal', 'robot')
 			except tf.Exception as e:
 				print e
 
@@ -73,7 +73,10 @@ class Trajectory:
 		x_coord = self.z_x_poly.r[0]
 		y_coord = self.z_y_poly.r[0]
 
-		return [x_coord, y_coord]
+		if np.iscomplex(x_coord) or np.iscomplex(y_coord):
+			return (None, None)
+
+		return (x_coord, y_coord)
 
 if __name__ == '__main__':
 	Trajectory()
