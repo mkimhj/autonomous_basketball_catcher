@@ -48,8 +48,6 @@ class Trajectory:
 		self.z_x_poly = np.poly1d(x_z)
 		self.z_y_poly = np.poly1d(y_z)
 
-	
-
 	def show_polynomials(self):
 		x_new = np.linspace(self.x[0], self.x[-1], 50)
 		y_new = np.linspace(self.y[0], self.y[-1], 50)
@@ -83,8 +81,32 @@ class Trajectory:
 
 		return (x_coord, y_coord)
 
+	def compute_line(self):
+		x_y = np.polyfit(self.x, self.y, 1)
+		self.x_y_line = np.poly1d(x_y)
+
 	def get_projected_coordinates_from_line(self):
 		self.compute_line()
+
+		#determine direction
+		begin_coord = (self.x[0], self.y[0])
+		final_coord = (self.x[len(self.x) - 1], self.y[len(self.y) -1])
+		direction = begin_coord[0] - final_coord[0]
+
+		x_coord = begin_coord[0]
+
+		if direction < 0:
+			x_coord += 1
+		else:
+			x_coord += -1
+
+		y_coord = self.x_y_line(x_coord)
+
+		print self.x_y_line
+		print x_coord
+		print y_coord
+
+		return [x_coord, y_coord]
 
 if __name__ == '__main__':
 	Trajectory()
