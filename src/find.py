@@ -7,7 +7,7 @@ from sensor_msgs.msg import Image
 import cv2
 from cv_bridge import CvBridge
 import tf
-from math import pi, atan, isnan
+from math import pi, atan, isnan, sqrt
 
 DEGREES_TO_RADIANS = pi / 180
 K_VERTICAL_FOV = 43 * DEGREES_TO_RADIANS
@@ -37,13 +37,13 @@ class Find:
 		processed[:, :, 0] = ranged
 		for contour in contours:
 			area = cv2.contourArea(contour)
-			if 500 < area < 5000:
+			radius = sqrt(area / pi)
+			x, y, w, h = cv2.boundingRect(contour)
+			x, y = x + w / 2, y + h / 2
+			z = depth[y, x] * 10
+			aspect = float(w) / h
+			if 15 < radius * z < 35 and 500 < area < 5000 and (1.0 / 1.6) < aspect < 1.6:
 				cv2.drawContours(processed, np.array([contour]), -1, (0, 255, 0), 3)
-				rect = cv2.boundingRect(contour)
-				x, y, w, h = rect
-				x += w / 2
-				y += h / 2
-				z = depth[y, x] * 10
 				if not isnan(z):
 					self.tf.sendTransform(self.project(x, y, z), (0, 0, 0, 1),
 						msg.header.stamp, "trash", "camera_depth_optical_frame")

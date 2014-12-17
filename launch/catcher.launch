@@ -20,15 +20,8 @@
   <arg name="robot_frame" default="robot" />
   <arg name="robot_parent_frame" default="ar_marker_0" />
   <arg name="robot_frame_period" default="100" />
-  <arg name="robot_transform" default="-0.159 0 0 -1.5707963268 0 0" />
+  <arg name="robot_transform" default="0 0 -0.159 0 0 -1.5707963268" />
   <node name="robot_frame" pkg="tf" type="static_transform_publisher" args="$(arg robot_transform) $(arg robot_parent_frame) $(arg robot_frame) $(arg robot_frame_period)" />
-
-  <!-- Enables ROS to communicate with the Arduino over Bluetooth.
-  <node name="bluetooth" pkg="rosserial_python" type="serial_node.py">
-    <param name="port" value="/dev/ttyACM1"/>
-    <param name="baud" value="115200"/>
-  </node>
-  -->
 
   <!-- Takes in images from the Kinect and outputs trash frames. -->
   <node name="find" pkg="catcher" type="find.py" output="screen" />
@@ -38,5 +31,8 @@
 
   <!-- Takes in goal frames and sends motor commands. -->
   <node name="navigation" pkg="catcher" type="navigation.py" output="screen" />
+
+  <!-- Control -->
+  <node name="control" pkg="catcher" type="control.py" output="screen" />
 
 </launch>

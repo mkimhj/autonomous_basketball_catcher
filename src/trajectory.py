@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 import rospy
+from std_msgs.msg import String
 import tf
 import numpy as np
 import warnings
@@ -10,29 +11,35 @@ class Trajectory:
 
 	def __init__(self):
 		rospy.init_node('trajectory')
-		self.x = []
-		self.y = []
-		self.z = []
+		self.control_state = 'waiting'
+		rospy.Subscriber('/catcher/control', String, self.received_control)
 		listener = tf.TransformListener()
 		broadcaster = tf.TransformBroadcaster()
 		while not rospy.is_shutdown():
 			now = rospy.Time.now()
-			try:
-				listener.waitForTransform('trash', 'robot', now, rospy.Duration(0.2))
-				position, orientation = listener.lookupTransform('trash', 'robot', now)
-				print "sample:", position
-				self.x = self.x[-6:-1]
-				self.y = self.y[-6:-1]
-				self.z = self.z[-6:-1]
-				self.x.append(position[0])
-				self.y.append(position[1])
-				self.z.append(position[2])
-				x, y = self.get_projected_coordinates_from_line()
-				if x and y:
-					print x, y
-					broadcaster.sendTransform((x, y, 0), (0, 0, 0, 1), now, 'goal', 'robot')
-			except tf.Exception as e:
-				print e
+			if self.control_state == 'waiting':
+				self.x = []
+				self.y = []
+				self.z = []
+			if self.control_state == 'sampling':
+				try:
+					listener.waitForTransform('trash', 'robot', now, rospy.Duration(0.2))
+					position, orientation = listener.lookupTransform('trash', 'robot', now)
+					self.x.append(position[0])
+					self.y.append(position[1])
+					self.z.append(position[2])
+					print 'position =', position
+				except tf.Exception as e:
+					pass
+			if self.control_state == 'driving':
+				if len(self.x) >= 3:
+					x, y = self.get_projected_coordinates_from_line()
+					print 'x, y =', x, y
+					if x and y:
+						broadcaster.sendTransform((x, y, 0), (0, 0, 0, 1), now, 'goal', 'robot')
+
+	def received_control(self, msg):
+		self.control_state = msg.data
 
 	def compute_polynomials(self):
 		# calculate polynomials
@@ -101,10 +108,6 @@ class Trajectory:
 			x_coord += -1
 
 		y_coord = self.x_y_line(x_coord)
-
-		print self.x_y_line
-		print x_coord
-		print y_coord
 
 		return [x_coord, y_coord]
 
