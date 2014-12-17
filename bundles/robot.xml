@@ -8,14 +8,13 @@
     - The center of the first marker defines the frame for the other tags.
     - The order of the corners starts with the lower left corner and progresses
       counter-clockwise around the tag.
-    - The size of the markers is 16.9 cm (8.45 cm).
-    - Diameter of trash can is 28.8 cm
-    - Width of foam board is 1.5 cm
-    - Total distance from tag to tag is 31.8 cm (15.9 cm)
+    - length of car: 20.1
+    - width of car: 24.8
 
-        1       x         x
+
+        3       x         x
       |---|     ^ Robot   ^ ar_marker_0
-    3  | |  0   | Frame   | Frame
+    1  | |  0   | Frame   | Frame
       |---|     O-- > y   O-- > z
         2
 -->
@@ -26,22 +25,22 @@
         <corner x="8.45" y="8.45" z="0" />
         <corner x="-8.45" y="8.45" z="0" />
     </marker>
-    <marker index="1" status="1">
-        <corner x="15.9" y="-8.45" z="-7.45" />
-        <corner x="15.9" y="-8.45" z="-24.35" />
-        <corner x="15.9" y="8.45" z="-24.35" />
-        <corner x="15.9" y="8.45" z="-7.45" />
-    </marker>
     <marker index="3" status="1">
-        <corner x="8.45" y="-8.45" z="-28.8" />
-        <corner x="-8.45" y="-8.45" z="-28.8" />
-        <corner x="-8.45" y="8.45" z="-28.8" />
-        <corner x="8.45" y="8.45" z="-28.8" />
+        <corner x="10.05" y="-8.45" z="-3.95" />
+        <corner x="10.05" y="-8.45" z="-20.85" />
+        <corner x="10.05" y="8.45" z="-20.85" />
+        <corner x="10.05" y="8.45" z="-3.95" />
+    </marker>
+    <marker index="1" status="1">
+        <corner x="8.45" y="-8.45" z="-24.8" />
+        <corner x="-8.45" y="-8.45" z="-24.8" />
+        <corner x="-8.45" y="8.45" z="-24.8" />
+        <corner x="8.45" y="8.45" z="-24.8" />
     </marker>
     <marker index="2" status="1">
-        <corner x="-15.9" y="-8.45" z="-24.35" />
-        <corner x="-15.9" y="-8.45" z="-7.45" />
-        <corner x="-15.9" y="8.45" z="-7.45" />
-        <corner x="-15.9" y="8.45" z="-24.35" />
+        <corner x="-10.05" y="-8.45" z="-20.85" />
+        <corner x="-10.05" y="-8.45" z="-3.95" />
+        <corner x="-10.05" y="8.45" z="-3.95" />
+        <corner x="-10.05" y="8.45" z="-20.85" />
     </marker>
 </multimarker>

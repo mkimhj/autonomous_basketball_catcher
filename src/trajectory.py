@@ -23,15 +23,15 @@ class Trajectory:
 				self.z = []
 			if self.control_state == 'sampling':
 				try:
-					listener.waitForTransform('trash', 'robot', now, rospy.Duration(0.2))
+					listener.waitForTransform('trash', 'robot', now, rospy.Duration(2.0))
 					position, orientation = listener.lookupTransform('trash', 'robot', now)
 					self.x.append(position[0])
 					self.y.append(position[1])
 					self.z.append(position[2])
 					print 'position =', position
 				except tf.Exception as e:
-					pass
-			if self.control_state == 'driving':
+					rospy.logerr(e)
+			if self.control_state == 'sampling' or self.control_state == 'driving':
 				if len(self.x) >= 3:
 					x, y = self.get_projected_coordinates_from_line()
 					print 'x, y =', x, y

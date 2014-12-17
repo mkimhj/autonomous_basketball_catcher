@@ -28,10 +28,10 @@ class Find:
 		rospy.spin()
 
 	def process_image(self, msg):
-		depth = self.cv_bridge.imgmsg_to_cv2(msg)
-		depth = depth.astype(float) / K_MAX_DEPTH_MM
+		mms = self.cv_bridge.imgmsg_to_cv2(msg)
+		depth = mms.astype(float) / K_MAX_DEPTH_MM
 		depth[depth == 0] = 1
-		ranged = cv2.inRange(depth, 0, 0.2)
+		ranged = cv2.inRange(depth, 0, 0.3)
 		contours, _ = cv2.findContours(ranged.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 		processed = np.zeros((480, 640, 3), np.uint8)
 		processed[:, :, 0] = ranged
@@ -40,9 +40,9 @@ class Find:
 			radius = sqrt(area / pi)
 			x, y, w, h = cv2.boundingRect(contour)
 			x, y = x + w / 2, y + h / 2
-			z = depth[y, x] * 10
+			z = float(mms[y, x]) / 1000
 			aspect = float(w) / h
-			if 15 < radius * z < 35 and 500 < area < 5000 and (1.0 / 1.6) < aspect < 1.6:
+			if 15 < radius * z < 35 and 250 < area < 5000 and (1.0 / 1.6) < aspect < 1.6:
 				cv2.drawContours(processed, np.array([contour]), -1, (0, 255, 0), 3)
 				if not isnan(z):
 					self.tf.sendTransform(self.project(x, y, z), (0, 0, 0, 1),

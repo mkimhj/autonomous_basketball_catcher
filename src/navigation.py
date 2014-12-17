@@ -18,16 +18,17 @@ class Navigation:
 			if self.control_state == 'sampling' or self.control_state == 'driving':
 				now = rospy.Time.now()
 				try:
-					listener.waitForTransform('goal', 'robot', now, rospy.Duration(2.0))
-					position, orientation = listener.lookupTransform('goal', 'robot', now)
-					next
+					listener.waitForTransform('robot', 'trash', now, rospy.Duration(2.0))
+					position, orientation = listener.lookupTransform('robot', 'trash', now)
+					x, y, z = position
+					print 'x, y =', x, y
 					self.send(x, y)
 				except tf.Exception as e:
-					print e
+					rospy.logerr(e)
 
 	def send(self, x, y):
 		x, y = 32768 + int(x * 1000), 32768 + int(y * 1000)
-		system('gatttool -b CC:B1:07:3E:1B:F9 -t random --char-write --handle=0xb --value=%0.4x%0.4x', x, y)
+		system('gatttool -b CC:B1:07:3E:1B:F9 -t random --char-write --handle=0xb --value=%0.4x%0.4x'%(x, y))
 
 	def received_control(self, msg):
 		self.control_state = msg.data
