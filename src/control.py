@@ -18,22 +18,11 @@ class Control:
 
 	def state_waiting(self):
 		raw_input()
-		self.state = 'sampling'
+		self.state = 'spinning'
 
-	def state_sampling(self):
+	def state_spinning(self):
 		raw_input()
-		self.state = 'driving'
-
-	def state_driving(self):
-		try:
-			now = rospy.Time.now()
-			self.tf.waitForTransform('goal', 'robot', now, rospy.Duration(2.0))
-			position, orientation = listener.lookupTransform('goal', 'robot', now)
-			distance = vector_norm(position)
-			if distance < 0.1:
-				self.state = 'waiting'
-		except tf.Exception:
-			pass
+		self.state = 'waiting'
 
 if __name__ == '__main__':
 	Control()

@@ -12,7 +12,7 @@ class Trajectory:
 	def __init__(self):
 		rospy.init_node('trajectory')
 		self.control_state = 'waiting'
-		rospy.Subscriber('/catcher/control', String, self.received_control)
+		#rospy.Subscriber('/catcher/control', String, self.received_control)
 		listener = tf.TransformListener()
 		broadcaster = tf.TransformBroadcaster()
 		while not rospy.is_shutdown():

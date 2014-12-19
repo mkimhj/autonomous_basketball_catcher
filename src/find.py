@@ -25,6 +25,7 @@ class Find:
 		rospy.Subscriber('/camera/depth/image_raw', Image, self.process_image)
 		self.tf = tf.TransformBroadcaster()
 		self.cv_bridge = CvBridge()
+		self.last_position = None
 		rospy.spin()
 
 	def process_image(self, msg):
@@ -35,6 +36,9 @@ class Find:
 		contours, _ = cv2.findContours(ranged.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 		processed = np.zeros((480, 640, 3), np.uint8)
 		processed[:, :, 0] = ranged
+		closest = None
+		position = None
+		distance = float('inf')
 		for contour in contours:
 			area = cv2.contourArea(contour)
 			radius = sqrt(area / pi)
@@ -42,21 +46,24 @@ class Find:
 			x, y = x + w / 2, y + h / 2
 			z = float(mms[y, x]) / 1000
 			aspect = float(w) / h
-			if 15 < radius * z < 35 and 250 < area < 5000 and (1.0 / 1.6) < aspect < 1.6:
-				cv2.drawContours(processed, np.array([contour]), -1, (0, 255, 0), 3)
-				if not isnan(z):
-					self.tf.sendTransform(self.project(x, y, z), (0, 0, 0, 1),
-						msg.header.stamp, "trash", "camera_depth_optical_frame")
-				break
-		cv2.imshow('depth', processed)
-		cv2.waitKey(10)
+			if 15 < radius * z < 35 and 500 < area < 5000:
+				if z < distance:
+					closest = contour
+					position = self.project(x, y, z)
+					distance = z
+		if closest != None:
+			#cv2.drawContours(processed, np.array([closest]), -1, (0, 255, 0), 3)
+			self.tf.sendTransform(position, (0, 0, 0, 1),
+				msg.header.stamp, "trash", "camera_depth_optical_frame")
+		#cv2.imshow('depth', processed)
+		#cv2.waitKey(10)
 
 	def project(self, u, v, z):
 		u -= K_HALF_WIDTH
 		v -= K_HALF_HEIGHT
 		x = (u / K_HORIZONTAL_DEPTH) * z
 		y = (v / K_VERTICAL_DEPTH) * z
-		return x, y, z
+		return np.array((x, y, z))
 
 if __name__ == '__main__':
 	Find()

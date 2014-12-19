@@ -32,7 +32,4 @@
   <!-- Takes in goal frames and sends motor commands. -->
   <node name="navigation" pkg="catcher" type="navigation.py" output="screen" />
 
-  <!-- Control -->
-  <node name="control" pkg="catcher" type="control.py" output="screen" />
-
 </launch>

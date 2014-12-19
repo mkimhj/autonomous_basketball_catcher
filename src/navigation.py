@@ -13,18 +13,16 @@ class Navigation:
 		rospy.init_node('navigation')
 		listener = tf.TransformListener()
 		self.control_state = 'waiting'
-		rospy.Subscriber('/catcher/control', String, self.received_control)
+		# rospy.Subscriber('/catcher/control', String, self.received_control)
 		while not rospy.is_shutdown():
-			if self.control_state == 'sampling' or self.control_state == 'driving':
+			try:
+				raw_input()
 				now = rospy.Time.now()
-				try:
-					listener.waitForTransform('robot', 'trash', now, rospy.Duration(2.0))
-					position, orientation = listener.lookupTransform('robot', 'trash', now)
-					x, y, z = position
-					print 'x, y =', x, y
-					self.send(x, y)
-				except tf.Exception as e:
-					rospy.logerr(e)
+				listener.waitForTransform('robot', 'trash', now, rospy.Duration(2.0))
+				position, orientation = listener.lookupTransform('robot', 'trash', now)
+				self.send(position[0], position[1])
+			except tf.Exception as e:
+				rospy.logerr(e)
 
 	def send(self, x, y):
 		x, y = 32768 + int(x * 1000), 32768 + int(y * 1000)
